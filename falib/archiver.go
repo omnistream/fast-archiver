@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
+//	"strings"
 	"sync"
 )
 
@@ -85,11 +85,13 @@ func (a *Archiver) Run() error {
 
 func (a *Archiver) directoryScanner() {
 	for directoryPath := range a.directoryScanQueue {
+/*
 		if strings.HasPrefix(directoryPath, "/") {
 			a.error = ErrAbsoluteDirectoryPath
 			a.workInProgress.Done()
 			continue
 		}
+*/
 		a.Logger.Verbose(directoryPath)
 
 		directory, err := os.Open(directoryPath)
@@ -104,9 +106,8 @@ func (a *Archiver) directoryScanner() {
 
 		for fileName := range a.readdirnames(directory) {
 			filePath := filepath.Join(directoryPath, fileName)
-
 			excludeFile := false
-			for _, excludePattern := range a.excludePatterns {
+			for _, excludePattern := range a.ExcludePatterns {
 				match, err := filepath.Match(excludePattern, filePath)
 				if err == nil && match {
 					excludeFile = true
