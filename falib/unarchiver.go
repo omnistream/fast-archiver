@@ -8,7 +8,7 @@ import (
 	"hash/crc64"
 	"io"
 	"os"
-	"strings"
+	//"strings"
 	"sync"
 )
 
@@ -33,11 +33,13 @@ type Unarchiver struct {
 	DryRun       bool
 
 	file io.Reader
+	OutputPath string
 }
 
 func NewUnarchiver(file io.Reader) *Unarchiver {
 	retval := &Unarchiver{}
 	retval.file = bufio.NewReader(file)
+        retval.OutputPath = "/tmp"
 	return retval
 }
 
@@ -70,9 +72,12 @@ func (u *Unarchiver) Run() error {
 			return err
 		}
 		filePath := string(buf)
+/*
 		if strings.HasPrefix(filePath, "/") {
 			return ErrAbsoluteDirectoryPath
 		}
+*/
+                filePath = u.OutputPath + filePath  
 
 		blockType := make([]byte, 1)
 		_, err = io.ReadFull(reader, blockType)
@@ -151,7 +156,7 @@ func (u *Unarchiver) Run() error {
 				continue
 			}
 
-			err = os.Mkdir(filePath, mode)
+			err = os.MkdirAll(filePath, mode)
 			if err != nil && !os.IsExist(err) {
 				return err
 			}
